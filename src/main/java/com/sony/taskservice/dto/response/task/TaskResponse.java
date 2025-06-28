@@ -13,6 +13,7 @@ import java.util.List;
 public class TaskResponse {
     private String id;
     private String name;
+    private String userId;
     private String description;
     private Instant createdAt;
     private Instant updatedAt;
@@ -21,6 +22,7 @@ public class TaskResponse {
     public TaskResponse(Task task, List<Todo> todos) {
         this.id = task.getId();
         this.name = task.getName();
+        this.userId = task.getUserId();
         this.description = task.getDescription();
         this.createdAt = task.getCreatedAt();
         this.updatedAt = task.getUpdatedAt();

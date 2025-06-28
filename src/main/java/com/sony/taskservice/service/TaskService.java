@@ -5,12 +5,13 @@ import com.sony.taskservice.dto.request.CreateTodoRequest;
 import com.sony.taskservice.dto.response.task.TaskResponse;
 import com.sony.taskservice.enums.TodoStatus;
 import com.sony.taskservice.exception.DuplicateException;
+import com.sony.taskservice.exception.NotFoundException;
 import com.sony.taskservice.model.Task;
 import com.sony.taskservice.model.Todo;
+import com.sony.taskservice.publisher.TaskEventPublisher;
 import com.sony.taskservice.repository.TaskRepository;
 import com.sony.taskservice.repository.TodoRepository;
 
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +29,9 @@ public class TaskService {
 
     @Autowired
     private TodoRepository todoRepository;
+
+    @Autowired
+    private TaskEventPublisher taskEventPublisher;
 
     private List<Todo> validateCreateTodos(CreateTaskRequest reqBody){
         List<CreateTodoRequest> todos = reqBody.getTodos();
@@ -71,6 +75,19 @@ public class TaskService {
 
         List<Todo> createdTodos = todoRepository.saveAll(todos);
 
+        taskEventPublisher.publish(createdTask.getId());
+
         return new TaskResponse(createdTask,createdTodos);
+    }
+
+    public TaskResponse getByID(String id){
+        Optional<Task> task = taskRepository.findByIdAndDeletedAtIsNull(id);
+        if (task.isEmpty()){
+            throw new NotFoundException("Task with such id does not exist");
+        }
+
+        List<Todo> todos = todoRepository.findByTaskID(id);
+
+        return new TaskResponse(task.get(),todos);
     }
 }
