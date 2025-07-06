@@ -90,4 +90,13 @@ public class TaskService {
 
         return new TaskResponse(task.get(),todos);
     }
+
+    public List<TaskResponse> getByUserId(String userId){
+        List<Task> tasks =   taskRepository.findByUserIdAndDeletedAtIsNull(userId);
+
+        return tasks.stream().map(t->{
+            List<Todo> todos = todoRepository.findByTaskID(t.getId());
+            return new TaskResponse(t,todos);
+        }).toList();
+    }
 }
