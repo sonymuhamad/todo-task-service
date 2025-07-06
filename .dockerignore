@@ -1,0 +1,16 @@
+# Maven
+.mvn/
+.settings/
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+
+# Git
+.git
+.gitignore
+
+# Env / secrets
+.env
+*.env
